@@ -1,49 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import './index.css';
-
-function Square(props) {
-    return (
-        <button className="square" onClick={props.onClick}>
-            {props.value}
-        </button>
-    );
-}
-  
-class Board extends React.Component {
-    
-
-    renderSquare(i) {
-        return (
-            <Square 
-            value={this.props.squares[i]} 
-            onClick={() => this.props.onClick(i)}
-            />
-        );
-    }
-  
-    render() {
-        return (
-            <div>
-                <div className="board-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(6)}
-                    {this.renderSquare(7)}
-                    {this.renderSquare(8)}
-                </div>
-            </div>
-        );
-    }
-}
+import Board from './Board';
+import { List, Button, ListItemText } from '@material-ui/core';
   
 class Game extends React.Component {
     constructor(props) {
@@ -54,6 +14,7 @@ class Game extends React.Component {
             }],
             stepNumber: 0,
             xIsNext: true,
+            winnerList: [],
         };
     }
 
@@ -92,30 +53,41 @@ class Game extends React.Component {
                 'Go to game start';
             return (
                 <li key={move}>
-                    <button onClick={() => this.jumpTo(move)}>{desc}</button>
+                    <Button variant="contained" color="primary" onClick={() => this.jumpTo(move) }>
+                        {desc}
+                    </Button>
                 </li>
             );
         });
 
         let status;
+        let hasWinner = false;
         if (winner) {
             status = 'Winner: ' + winner;
+            hasWinner = true;
         } else {
-            status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+            status = ('Next player: ' + (this.state.xIsNext ? 'X' : 'O'));
+            hasWinner = false;
         }
 
         return (
             <div className="game">
-            <div className="game-board">
-                <Board
-                    squares={current.squares}
-                    onClick={(i) => this.handleClick(i)} 
-                />
-            </div>
-            <div className="game-info">
-                <div>{status}</div>
-                <ol>{moves}</ol>
-            </div>
+                <div className="game-board">
+                    <Board
+                        squares={current.squares}
+                        onClick={(i) => this.handleClick(i)} 
+                    />
+                </div>
+                <div className="game-info">
+                    <div>{"Game Steps"}</div>
+                    <ol>{moves}</ol>
+                </div>
+                <div className="game-record">
+                    <div>{"Game Record"}</div>
+                    <List>
+                        {hasWinner?<ListItemText primary={winner + " winned"}/>:<ListItemText primary={status}/>}
+                    </List>
+                </div>
             </div>
         );
     }
